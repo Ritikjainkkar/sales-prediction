@@ -1,6 +1,6 @@
-import React from 'react'
-import Head from 'next/head'
-import axios from 'axios';
+import React from "react";
+import Head from "next/head";
+import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,9 +9,9 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-import Dropdown from '../component/DropDown'
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+import Dropdown from "../component/DropDown";
 
 ChartJS.register(
   CategoryScale,
@@ -33,104 +33,101 @@ export default function Home() {
     var day = date.getUTCDate();
     var year = date.getUTCFullYear();
     const startDate = year + "-" + month + "-" + day;
-    const endDate = year + "-" + month + "-" + (day+18);
+    const endDate = year + "-" + month + "-" + (day + 18);
     return {
-      startDate, endDate
-    }
-  }
+      startDate,
+      endDate,
+    };
+  };
 
   React.useEffect(() => {
-    const {startDate, endDate } = getDates();
-    
+    const { startDate, endDate } = getDates();
 
-    (async() => {
+    (async () => {
       setData({});
-      const result = await axios.get('http://localhost:8000/get', {
+      const result = await axios.get("http://localhost:8000/get", {
         params: {
           startDate: startDate,
           endDate: endDate,
-          location: selectedTab
-        }
+          location: selectedTab,
+        },
       });
       setData(result);
     })();
-
-  },[ selectedTab ])
+  }, [selectedTab]);
 
   const options = {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: "top" as const,
       },
       title: {
         display: true,
-        text: 'Here Im',
+        text: "Here Im",
       },
     },
-    tooltips: {
-      callbacks: {
-          label: function(tooltipItem: any, data : any) {
-            console.log('data', data)
-              return tooltipItem.yLabel;
-          }
-      }
-    }
   };
-  
-  const labels = data?.data?.labels || []
-  const isOpen = data?.data?.isOpen || []
-  
+
+  const labels = data?.data?.labels || [];
+  const isOpen = data?.data?.isOpen || [];
+
   const data1 = {
     labels,
     datasets: [
       {
-        label: 'Sales Prediction',
+        label: "Sales Prediction",
         data: data?.data?.chartData || [],
-        backgroundColor: isOpen.map((e) => (e || !alert) ? 'rgba(255, 99, 132, 0.5)' : 'lightgray'),
+        backgroundColor: isOpen.map((e) =>
+          e || !alert ? "rgba(255, 99, 132, 0.5)" : "lightgray"
+        ),
       },
       {
-        label: '10 multiple avg temprature of a day ',
+        label: "10 multiple avg temprature of a day ",
         data: data?.data?.avgTemp || [],
-        backgroundColor: 'black',
-      }
-    ]
-  }
+        backgroundColor: "black",
+      },
+    ],
+  };
 
-  if(!data1) {
-    return (<></>) 
-  } 
+  if (!data1) {
+    return <></>;
+  }
 
   return (
     <>
       <style jsx>
         {`
-        .main {}
-        .container {
-          display: flex;
-          justify-content: space-between;
-          width: 100%;
-        }
-        .bar {
-          width: 70%;
-        }
-        .alert {
-          margin-top: 40px;
-          width: 150px;
-          height: 45px;
-          border-radius: 12px;
-          background: pink;
-          border: 0px;
-        }
-        ul {
-          margin-top: 150px;
-          font-size: 24px;
-        }
-        @media(max-screen: 800px) {
-          .container {
-            display: block;
+          .main {
           }
-        }
+          .container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+          }
+          .bar {
+            width: 70%;
+          }
+          .alert {
+            width: 150px;
+            height: 45px;
+            border-radius: 12px;
+            background: pink;
+            border: 0px;
+          }
+          .list {
+            margin-top: 150px;
+            font-size: 24px;
+          }
+          h6 {
+            margin-top: 40px;
+            font-size: 16px;
+          }
+          @media (max-screen: 800px) {
+            .container {
+              display: block;
+            }
+          }
         `}
       </style>
       <Head>
@@ -140,32 +137,34 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="mian">
-        <div className='container'>
+        <div className="container">
           <div>
-          <Dropdown 
-            setSelectedTab={setSelectedTab}
-            selectedTab={selectedTab}
-          />
-          {alert ? <ul>
-            {isOpen.map((e : string,i : number) => {
-              if(!e) {
-                return (
-                  <li key={i}>{labels[i]}</li>
-                )
-              }
-            })}
-          </ul> : null }
+            <Dropdown
+              setSelectedTab={setSelectedTab}
+              selectedTab={selectedTab}
+            />
+            {alert ? (
+              <div className="list">
+                <h4>Store Close Days</h4>
+                <ul>
+                  {isOpen.map((e: string, i: number) => {
+                    if (!e) {
+                      return <li key={i}>{labels[i]}</li>;
+                    }
+                  })}
+                </ul>
+              </div>
+            ) : null}
           </div>
-          <div className='bar'>
-          <Bar 
-            className='chart'
-            options={options} 
-            data={data1} 
-          />
-          <button className='alert' onClick={() => setAlert(!alert)}>Alerts</button>
+          <div className="bar">
+            <Bar className="chart" options={options} data={data1} />
+            <h6>Click on alert button to check store close days</h6>
+            <button className="alert" onClick={() => setAlert(!alert)}>
+              Alerts
+            </button>
           </div>
         </div>
       </main>
     </>
-  )
+  );
 }

@@ -2,7 +2,7 @@ import express from "express";
 import pg from "pg";
 import { getWeatherData } from "./services.js";
 import dotenv from "dotenv";
-import cors from "cors"
+import cors from "cors";
 import { getChartLabels, getChartData, getIsOpenStore } from "./util.js";
 
 var app = express();
@@ -35,10 +35,8 @@ app.get("/get", async function (req, res, _) {
     const weatherData = await getWeatherData(startDate, endDate, location);
     const result = await connectDbAndGetData(query);
     const chartData = getChartData(result);
-    const finalDecision = getIsOpenStore(weatherData, chartData)
+    const finalDecision = getIsOpenStore(weatherData, chartData);
     const response = {
-      prediction: result,
-      weather: weatherData,
       labels: getChartLabels(result),
       chartData,
       isOpen: finalDecision.isOpen,
